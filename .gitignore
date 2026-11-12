@@ -1,0 +1,24 @@
+# env
+.env
+.env.local
+
+# go
+backend/bin/
+backend/coverage.out
+backend/tmp/
+
+# node / next
+web/node_modules/
+web/.next/
+web/out/
+web/.env*.local
+
+# tooling
+.DS_Store
+*.log
+.idea/
+.vscode/
+
+# typescript build info
+web/tsconfig.tsbuildinfo
+*.tsbuildinfo
