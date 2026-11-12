@@ -60,6 +60,37 @@ export default function ConsoleLayout({ children }: { children: React.ReactNode 
     );
   }
 
+  // Couriers work from the agent console, not the dispatch board. Saying so
+  // plainly beats a screen full of permission errors.
+  if (session.tenant.role === "delivery_agent") {
+    return (
+      <div className="shell">
+        <header className="topbar">
+          <span className="wordmark">
+            <span className="beacon" />
+            Waypoint
+          </span>
+          <span className="spacer" />
+          <button className="btn btn-sm" onClick={signOut} disabled={signingOut}>
+            Sign out
+          </button>
+        </header>
+        <main className="main">
+          <div className="notice" style={{ maxWidth: 620 }}>
+            <strong style={{ fontWeight: 600 }}>This is the operations console.</strong>
+            <p className="muted" style={{ margin: "8px 0 16px" }}>
+              Your account is a delivery agent, so it can read shipments but not orders or
+              stock. Your own route lives in the agent console.
+            </p>
+            <Link className="btn btn-primary" href="/agent">
+              Open the agent console
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="shell">
       <header className="topbar">
