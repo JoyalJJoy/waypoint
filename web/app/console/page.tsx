@@ -6,7 +6,7 @@ import { NewOrderForm } from "@/components/NewOrderForm";
 import { StatusChip } from "@/components/StatusChip";
 import { ApiError, cancelOrder, confirmOrder, listOrders, listProducts, listWarehouses } from "@/lib/api";
 import { money, orderColor, relative } from "@/lib/format";
-import type { Order, OrderStatus, OrderSummary, Product, Warehouse } from "@/lib/types";
+import type { Order, OrderSummary, Product, Warehouse } from "@/lib/types";
 
 const filters: { key: string; label: string }[] = [
   { key: "", label: "All" },

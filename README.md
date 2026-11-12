@@ -1,3 +1,7 @@
+[![ci](https://github.com/JoyalJJoy/waypoint/actions/workflows/ci.yml/badge.svg)](https://github.com/JoyalJJoy/waypoint/actions/workflows/ci.yml)
+[![go](https://img.shields.io/badge/go-1.27-00ADD8?logo=go&logoColor=white)](https://go.dev)
+[![next](https://img.shields.io/badge/next-16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
+
 # Waypoint
 
 A multi-tenant logistics and order management platform. Waypoint takes an order from

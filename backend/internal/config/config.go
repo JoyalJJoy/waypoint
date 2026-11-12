@@ -28,11 +28,7 @@ type Config struct {
 
 func Load() (Config, error) {
 	// Local development convenience. Environment variables always win.
-	for _, path := range []string{".env", "../.env"} {
-		if _, err := os.Stat(path); err == nil {
-			_ = godotenv.Load(path)
-		}
-	}
+	loadDotEnv()
 
 	cfg := Config{
 		Env:                env("APP_ENV", "development"),
@@ -61,6 +57,27 @@ func Load() (Config, error) {
 	}
 
 	return cfg, nil
+}
+
+// LoadMigrate returns the owner connection string for schema migrations.
+// Migrations only need a database, so they must not be blocked by unrelated
+// configuration such as the JWT secret.
+func LoadMigrate() (string, error) {
+	loadDotEnv()
+
+	url := env("MIGRATE_DATABASE_URL", env("DATABASE_URL", ""))
+	if url == "" {
+		return "", fmt.Errorf("MIGRATE_DATABASE_URL is required")
+	}
+	return url, nil
+}
+
+func loadDotEnv() {
+	for _, path := range []string{".env", "../.env"} {
+		if _, err := os.Stat(path); err == nil {
+			_ = godotenv.Load(path)
+		}
+	}
 }
 
 func env(key, fallback string) string {

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load()
+	url, err := config.LoadMigrate()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,11 +22,11 @@ func main() {
 
 	switch command {
 	case "up":
-		err = migrations.Up(cfg.MigrateDatabaseURL)
+		err = migrations.Up(url)
 	case "down":
-		err = migrations.Down(cfg.MigrateDatabaseURL)
+		err = migrations.Down(url)
 	case "status":
-		err = migrations.Status(cfg.MigrateDatabaseURL)
+		err = migrations.Status(url)
 	default:
 		err = fmt.Errorf("unknown command %q (use up, down, or status)", command)
 	}

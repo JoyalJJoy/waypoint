@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: waypoint
+          POSTGRES_PASSWORD: waypoint
+          POSTGRES_DB: waypoint
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U waypoint -d waypoint"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      # The app role is what enforces row-level security in the tests, so it
+      # has to exist before the schema is created.
+      - name: create the application role
+        env:
+          PGPASSWORD: waypoint
+        run: psql -h localhost -U waypoint -d waypoint -f deploy/postgres-init.sql
+
+      - name: migrate
+        working-directory: backend
+        env:
+          MIGRATE_DATABASE_URL: postgres://waypoint:waypoint@localhost:5432/waypoint?sslmode=disable
+        run: go run ./cmd/migrate up
+
+      - name: vet
+        working-directory: backend
+        run: go vet ./...
+
+      - name: unit tests
+        working-directory: backend
+        run: go test ./...
+
+      - name: integration tests
+        working-directory: backend
+        run: go test -tags=integration ./...
+        env:
+          WAYPOINT_TEST_MIGRATE_DATABASE_URL: postgres://waypoint:waypoint@localhost:5432/waypoint?sslmode=disable
+          WAYPOINT_TEST_DATABASE_URL: postgres://waypoint_app:waypoint_app@localhost:5432/waypoint?sslmode=disable
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: install
+        working-directory: web
+        run: npm ci
+
+      - name: typecheck
+        working-directory: web
+        run: npx tsc --noEmit
+
+      - name: build
+        working-directory: web
+        run: npm run build
